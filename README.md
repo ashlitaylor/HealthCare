@@ -1,4 +1,4 @@
-# HealthCare
+# Socioeconomic Factors affecting Healthcare in America
 Project that examines how socioeconomic factors affect patient outcomes in America
 
 # Project Title
