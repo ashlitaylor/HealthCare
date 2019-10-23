@@ -13077,61 +13077,96 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Creating-a-Random-Forest-Model-to-Impute-Data">Creating a Random Forest Model to Impute Data<a class="anchor-link" href="#Creating-a-Random-Forest-Model-to-Impute-Data">&#182;</a></h1><table>
-    <tr>
-        <td>Foo</td>
-    </tr>
+<h1 id="Creating-a-Random-Forest-Model-to-Impute-Data">Creating a Random Forest Model to Impute Data<a class="anchor-link" href="#Creating-a-Random-Forest-Model-to-Impute-Data">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Data---Description">Data - Description<a class="anchor-link" href="#Data---Description">&#182;</a></h4><p>Our project uses readily available public datasets sourced from government databases. Process and outcome measure data from 2017 and socioeconomic data from 2016 was obtained from datasets available from the Department of Health and Human Services. We gathered data for over 4,800 public hospitals.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="The-Issue">The Issue<a class="anchor-link" href="#The-Issue">&#182;</a></h4><p>A limiting factor of the process and outcome measures dataset is that a hospital is not present in every county to evaluate. Additionally, not every hospital has a sufficient volume of adverse cases and events for meaningful, condition specific evaluation. This was observed in rural counties with lower population densities. These measures required the most processing due to Missing at Random (MAR) data. 
+<br/></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Read/Load-the-data">Read/Load the data<a class="anchor-link" href="#Read/Load-the-data">&#182;</a></h4><p>I read the data from a the data_ToImpute.csv file and use 'head' to view the input and confirm that the upload was successful and the data structure is correct.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[46]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="n">dataframe</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;https://raw.githubusercontent.com/ashlitaylor/HealthCare/master/data_ToImpute.csv&quot;</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th scope=col>ï..Seq</th><th scope=col>StateFIPS</th><th scope=col>CountyFIPS</th><th scope=col>STCOFIPS</th><th scope=col>State</th><th scope=col>CountyName</th><th scope=col>PCTNoHSDiploma</th><th scope=col>PCTHSDiploma</th><th scope=col>PCTSomeCollege</th><th scope=col>PCTCollegeDegree</th><th scope=col>...</th><th scope=col>StarRating</th><th scope=col>HCAPS</th><th scope=col>MedicatComm</th><th scope=col>CleanQuiet</th><th scope=col>DoctorComm</th><th scope=col>Rncomm</th><th scope=col>DischargeInfo</th><th scope=col>Payments</th><th scope=col>Readmissions</th><th scope=col>Mortality</th></tr></thead>
+<tbody>
+	<tr><td>1             </td><td>1             </td><td> 1            </td><td>1001          </td><td>AL            </td><td>Autauga County</td><td>12.3          </td><td>33.6          </td><td>29.1          </td><td>25.0          </td><td>...           </td><td>4.000000      </td><td>26            </td><td>67.67000      </td><td>73.59000      </td><td>85.55000      </td><td>81.84000      </td><td>90.23         </td><td>19663.67      </td><td>0.98750       </td><td>12.26667      </td></tr>
+	<tr><td>2             </td><td>1             </td><td> 3            </td><td>1003          </td><td>AL            </td><td>Baldwin County</td><td> 9.8          </td><td>27.8          </td><td>31.7          </td><td>30.7          </td><td>...           </td><td>2.666667      </td><td>39            </td><td>67.23333      </td><td>71.98667      </td><td>82.85667      </td><td>81.47667      </td><td>87.64         </td><td>17162.44      </td><td>1.04910       </td><td>14.48333      </td></tr>
+	<tr><td>3             </td><td>1             </td><td> 5            </td><td>1005          </td><td>AL            </td><td>Barbour County</td><td>26.9          </td><td>35.5          </td><td>25.5          </td><td>12.0          </td><td>...           </td><td>4.000000      </td><td>35            </td><td>73.10000      </td><td>76.04000      </td><td>87.32000      </td><td>80.50000      </td><td>84.93         </td><td>13838.00      </td><td>0.94005       </td><td>12.90000      </td></tr>
+	<tr><td>4             </td><td>1             </td><td> 7            </td><td>1007          </td><td>AL            </td><td>Bibb County   </td><td>17.9          </td><td>43.9          </td><td>25.0          </td><td>13.2          </td><td>...           </td><td>3.000000      </td><td>NA            </td><td>      NA      </td><td>      NA      </td><td>      NA      </td><td>      NA      </td><td>   NA         </td><td>16107.50      </td><td>1.00060       </td><td>14.90000      </td></tr>
+	<tr><td>5             </td><td>1             </td><td> 9            </td><td>1009          </td><td>AL            </td><td>Blount County </td><td>20.2          </td><td>32.3          </td><td>34.4          </td><td>13.1          </td><td>...           </td><td>3.000000      </td><td>NA            </td><td>      NA      </td><td>      NA      </td><td>      NA      </td><td>      NA      </td><td>   NA         </td><td>17569.00      </td><td>     NA       </td><td>13.10000      </td></tr>
+	<tr><td>6             </td><td>1             </td><td>11            </td><td>1011          </td><td>AL            </td><td>Bullock County</td><td>28.6          </td><td>36.6          </td><td>21.4          </td><td>13.4          </td><td>...           </td><td>3.000000      </td><td>NA            </td><td>      NA      </td><td>      NA      </td><td>      NA      </td><td>      NA      </td><td>   NA         </td><td>      NA      </td><td>     NA       </td><td>16.80000      </td></tr>
+</tbody>
 </table>
+
+</div>
+
+</div>
+
 </div>
 </div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="This-is-an-H4">This is an H4<a class="anchor-link" href="#This-is-an-H4">&#182;</a></h4><p>A limiting factor of the process and outcome measures is that a hospital is not present in every county to evaluate. Additionally, not every hospital has a sufficient volume of adverse cases and events for meaningful, condition specific evaluation. This was observed in rural counties with lower population densities. These measures required the most processing due to Missing at Random (MAR) data. See the Appendix for the list of all the collected measures and the completeness of the records.
-<img src="https://raw.githubusercontent.com/ashlitaylor/ashlitaylor.github.io/master/images/Healthcare.jpg" alt="Alt text"></p>
+<p>The first six columns contain State and County information that is complete. Only columns 29 - 38 have Missing at Random Data indicated by NaN. Columns 7 - 28 contain county level socioeconomic data that I will use in the imputation model. I separate these columns (7 - 38) into a separate matrix to use for the imputation model.</p>
+<p>I also create a new dataframe, dataDF, from the first six columns that I will use later when I create a dataframe from the complete, imputed data.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[47]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">Ecdat</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;ggplot2&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">ISLR</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;ISLR&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">ISLR</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">GGally</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;GGally&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">GGally</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">scatterplot3d</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;scatterplot3d&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">scatterplot3d</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">censReg</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;censReg&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">censReg</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">corrplot</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;corrplot&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">corrplot</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">tidyr</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;tidyr&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">tidyr</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">VGAM</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;VGAM&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">VGAM</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">BBmisc</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;BBmisc&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">BBmisc</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">gdata</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;gdata&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">gdata</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">readxl</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;readxl&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">readxl</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">missForest</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;missForest&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">missForest</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">xlsx</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;xlsx&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">xlsx</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">WriteXLS</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;WriteXLS&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">WriteXLS</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">openxlsx</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;openxlsx&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">openxlsx</span><span class="p">)</span>
-<span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">car</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;car&quot;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">car</span><span class="p">)</span>
+<div class=" highlight hl-r"><pre><span></span><span class="n">data</span> <span class="o">&lt;-</span> <span class="nf">data.matrix</span><span class="p">(</span><span class="n">dataframe[</span><span class="p">,</span><span class="m">7</span><span class="o">:</span><span class="m">38</span><span class="n">]</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">dataDF</span> <span class="o">&lt;-</span> <span class="n">dataframe[</span><span class="p">,</span><span class="m">2</span><span class="o">:</span><span class="m">6</span><span class="n">]</span>
 </pre></div>
 
     </div>
@@ -13147,458 +13182,24 @@ div#notebook {
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Loading required package: Ecfun
 
-Attaching package: &#39;Ecfun&#39;
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th scope=col>PCTNoHSDiploma</th><th scope=col>PCTHSDiploma</th><th scope=col>PCTSomeCollege</th><th scope=col>PCTCollegeDegree</th><th scope=col>PovertyRate</th><th scope=col>AvgHouseholdIncome</th><th scope=col>TotalPopulation</th><th scope=col>Males</th><th scope=col>Females</th><th scope=col>White</th><th scope=col>...</th><th scope=col>StarRating</th><th scope=col>HCAPS</th><th scope=col>MedicatComm</th><th scope=col>CleanQuiet</th><th scope=col>DoctorComm</th><th scope=col>Rncomm</th><th scope=col>DischargeInfo</th><th scope=col>Payments</th><th scope=col>Readmissions</th><th scope=col>Mortality</th></tr></thead>
+<tbody>
+	<tr><td>12.3    </td><td>33.6    </td><td>29.1    </td><td>25.0    </td><td>13.4    </td><td>58343   </td><td> 55278  </td><td>48.76624</td><td>51.23376</td><td>77.19527</td><td>...     </td><td>4.000000</td><td>26      </td><td>67.67000</td><td>73.59000</td><td>85.55000</td><td>81.84000</td><td>90.23   </td><td>19663.67</td><td>0.98750 </td><td>12.26667</td></tr>
+	<tr><td> 9.8    </td><td>27.8    </td><td>31.7    </td><td>30.7    </td><td>10.1    </td><td>56607   </td><td>207509  </td><td>48.59837</td><td>51.40163</td><td>87.17020</td><td>...     </td><td>2.666667</td><td>39      </td><td>67.23333</td><td>71.98667</td><td>82.85667</td><td>81.47667</td><td>87.64   </td><td>17162.44</td><td>1.04910 </td><td>14.48333</td></tr>
+	<tr><td>26.9    </td><td>35.5    </td><td>25.5    </td><td>12.0    </td><td>33.4    </td><td>32490   </td><td> 25774  </td><td>52.70816</td><td>47.29184</td><td>49.68573</td><td>...     </td><td>4.000000</td><td>35      </td><td>73.10000</td><td>76.04000</td><td>87.32000</td><td>80.50000</td><td>84.93   </td><td>13838.00</td><td>0.94005 </td><td>12.90000</td></tr>
+	<tr><td>17.9    </td><td>43.9    </td><td>25.0    </td><td>13.2    </td><td>20.2    </td><td>45795   </td><td> 22633  </td><td>53.49711</td><td>46.50289</td><td>76.66240</td><td>...     </td><td>3.000000</td><td>NA      </td><td>      NA</td><td>      NA</td><td>      NA</td><td>      NA</td><td>   NA   </td><td>16107.50</td><td>1.00060 </td><td>14.90000</td></tr>
+	<tr><td>20.2    </td><td>32.3    </td><td>34.4    </td><td>13.1    </td><td>12.8    </td><td>48253   </td><td> 57562  </td><td>49.26340</td><td>50.73660</td><td>96.02168</td><td>...     </td><td>3.000000</td><td>NA      </td><td>      NA</td><td>      NA</td><td>      NA</td><td>      NA</td><td>   NA   </td><td>17569.00</td><td>     NA </td><td>13.10000</td></tr>
+	<tr><td>28.6    </td><td>36.6    </td><td>21.4    </td><td>13.4    </td><td>34.4    </td><td>29113   </td><td> 10441  </td><td>54.24768</td><td>45.75232</td><td>26.56834</td><td>...     </td><td>3.000000</td><td>NA      </td><td>      NA</td><td>      NA</td><td>      NA</td><td>      NA</td><td>   NA   </td><td>      NA</td><td>     NA </td><td>16.80000</td></tr>
+</tbody>
+</table>
 
-The following object is masked from &#39;package:base&#39;:
-
-    sign
-
-
-Attaching package: &#39;Ecdat&#39;
-
-The following object is masked from &#39;package:datasets&#39;:
-
-    Orange
-
-Loading required package: ISLR
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;ISLR&#39;&#34;</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;ISLR&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Loading required package: GGally
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;GGally&#39;&#34;also installing the dependency &#39;reshape&#39;
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;reshape&#39; successfully unpacked and MD5 sums checked
-package &#39;GGally&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Registered S3 method overwritten by &#39;GGally&#39;:
-  method from   
-  +.gg   ggplot2
-
-Attaching package: &#39;GGally&#39;
-
-The following object is masked from &#39;package:dplyr&#39;:
-
-    nasa
-
-Loading required package: scatterplot3d
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;scatterplot3d&#39;&#34;</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;scatterplot3d&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Loading required package: censReg
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;censReg&#39;&#34;also installing the dependencies &#39;bibtex&#39;, &#39;gbRd&#39;, &#39;bdsmatrix&#39;, &#39;lmtest&#39;, &#39;Rdpack&#39;, &#39;Formula&#39;, &#39;maxLik&#39;, &#39;glmmML&#39;, &#39;sandwich&#39;, &#39;miscTools&#39;, &#39;plm&#39;
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;bibtex&#39; successfully unpacked and MD5 sums checked
-package &#39;gbRd&#39; successfully unpacked and MD5 sums checked
-package &#39;bdsmatrix&#39; successfully unpacked and MD5 sums checked
-package &#39;lmtest&#39; successfully unpacked and MD5 sums checked
-package &#39;Rdpack&#39; successfully unpacked and MD5 sums checked
-package &#39;Formula&#39; successfully unpacked and MD5 sums checked
-package &#39;maxLik&#39; successfully unpacked and MD5 sums checked
-package &#39;glmmML&#39; successfully unpacked and MD5 sums checked
-package &#39;sandwich&#39; successfully unpacked and MD5 sums checked
-package &#39;miscTools&#39; successfully unpacked and MD5 sums checked
-package &#39;plm&#39; successfully unpacked and MD5 sums checked
-package &#39;censReg&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Loading required package: maxLik
-Loading required package: miscTools
-
-Attaching package: &#39;miscTools&#39;
-
-The following object is masked from &#39;package:Ecfun&#39;:
-
-    checkNames
-
-
-Please cite the &#39;maxLik&#39; package as:
-Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihood estimation in R. Computational Statistics 26(3), 443-458. DOI 10.1007/s00180-010-0217-1.
-
-If you have questions, suggestions, or comments regarding the &#39;maxLik&#39; package, please use a forum or &#39;tracker&#39; at maxLik&#39;s R-Forge site:
-https://r-forge.r-project.org/projects/maxlik/
-
-Please cite the &#39;censReg&#39; package as:
-Henningsen, Arne (2017). censReg: Censored Regression (Tobit) Models. R package version 0.5. http://CRAN.R-Project.org/package=censReg.
-
-If you have questions, suggestions, or comments regarding the &#39;censReg&#39; package, please use a forum or &#39;tracker&#39; at the R-Forge site of the &#39;sampleSelection&#39; project:
-https://r-forge.r-project.org/projects/sampleselection/
-Loading required package: corrplot
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;corrplot&#39;&#34;</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;corrplot&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>corrplot 0.84 loaded
-Loading required package: VGAM
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;VGAM&#39;&#34;</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;VGAM&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Loading required package: stats4
-Loading required package: splines
-
-Attaching package: &#39;VGAM&#39;
-
-The following object is masked from &#39;package:tidyr&#39;:
-
-    fill
-
-Loading required package: BBmisc
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;BBmisc&#39;&#34;also installing the dependency &#39;checkmate&#39;
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;checkmate&#39; successfully unpacked and MD5 sums checked
-package &#39;BBmisc&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>
-Attaching package: &#39;BBmisc&#39;
-
-The following objects are masked from &#39;package:dplyr&#39;:
-
-    coalesce, collapse
-
-The following object is masked from &#39;package:base&#39;:
-
-    isFALSE
-
-Loading required package: gdata
-gdata: Unable to locate valid perl interpreter
-gdata: 
-gdata: read.xls() will be unable to read Excel XLS and XLSX files
-gdata: unless the &#39;perl=&#39; argument is used to specify the location of a
-gdata: valid perl intrpreter.
-gdata: 
-gdata: (To avoid display of this message in the future, please ensure
-gdata: perl is installed and available on the executable search path.)
-gdata: Unable to load perl libaries needed by read.xls()
-gdata: to support &#39;XLX&#39; (Excel 97-2004) files.
-
-gdata: Unable to load perl libaries needed by read.xls()
-gdata: to support &#39;XLSX&#39; (Excel 2007+) files.
-
-gdata: Run the function &#39;installXLSXsupport()&#39;
-gdata: to automatically download and install the perl
-gdata: libaries needed to support Excel XLS and XLSX formats.
-
-Attaching package: &#39;gdata&#39;
-
-The following object is masked from &#39;package:VGAM&#39;:
-
-    nobs
-
-The following object is masked from &#39;package:stats4&#39;:
-
-    nobs
-
-The following objects are masked from &#39;package:dplyr&#39;:
-
-    combine, first, last
-
-The following object is masked from &#39;package:stats&#39;:
-
-    nobs
-
-The following object is masked from &#39;package:utils&#39;:
-
-    object.size
-
-The following object is masked from &#39;package:base&#39;:
-
-    startsWith
-
-Loading required package: missForest
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;missForest&#39;&#34;also installing the dependency &#39;itertools&#39;
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;itertools&#39; successfully unpacked and MD5 sums checked
-package &#39;missForest&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Loading required package: randomForest
-randomForest 4.6-14
-Type rfNews() to see new features/changes/bug fixes.
-
-Attaching package: &#39;randomForest&#39;
-
-The following object is masked from &#39;package:gdata&#39;:
-
-    combine
-
-The following object is masked from &#39;package:ggplot2&#39;:
-
-    margin
-
-The following object is masked from &#39;package:dplyr&#39;:
-
-    combine
-
-Loading required package: foreach
-Loading required package: itertools
-Loading required package: iterators
-Loading required package: xlsx
-Warning message in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, :
-&#34;there is no package called &#39;xlsx&#39;&#34;also installing the dependencies &#39;rJava&#39;, &#39;xlsxjars&#39;
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>package &#39;rJava&#39; successfully unpacked and MD5 sums checked
-package &#39;xlsxjars&#39; successfully unpacked and MD5 sums checked
-package &#39;xlsx&#39; successfully unpacked and MD5 sums checked
-
-The downloaded binary packages are in
-	C:\Users\ShanoyaTaylor\AppData\Local\Temp\RtmpUr09qd\downloaded_packages
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_text output_error">
-<pre>
-Error: package or namespace load failed for &#39;xlsx&#39;:
- .onLoad failed in loadNamespace() for &#39;rJava&#39;, details:
-  call: fun(libname, pkgname)
-  error: No CurrentVersion entry in Software/JavaSoft registry! Try re-installing Java and make sure R and Java have matching architectures.
-Traceback:
-
-1. library(xlsx)
-2. tryCatch({
- .     attr(package, &#34;LibPath&#34;) &lt;- which.lib.loc
- .     ns &lt;- loadNamespace(package, lib.loc)
- .     env &lt;- attachNamespace(ns, pos = pos, deps, exclude, include.only)
- . }, error = function(e) {
- .     P &lt;- if (!is.null(cc &lt;- conditionCall(e))) 
- .         paste(&#34; in&#34;, deparse(cc)[1L])
- .     else &#34;&#34;
- .     msg &lt;- gettextf(&#34;package or namespace load failed for %s%s:\n %s&#34;, 
- .         sQuote(package), P, conditionMessage(e))
- .     if (logical.return) 
- .         message(paste(&#34;Error:&#34;, msg), domain = NA)
- .     else stop(msg, call. = FALSE, domain = NA)
- . })
-3. tryCatchList(expr, classes, parentenv, handlers)
-4. tryCatchOne(expr, names, parentenv, handlers[[1L]])
-5. value[[3L]](cond)
-6. stop(msg, call. = FALSE, domain = NA)</pre>
-</div>
 </div>
 
 </div>
-</div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">Ecdat</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span> 
-<span class="nf">library</span><span class="p">(</span><span class="n">ISLR</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">GGally</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">scatterplot3d</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">censReg</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">corrplot</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">tidyr</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">VGAM</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">BBmisc</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">gdata</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">readxl</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">missForest</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">xlsx</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">WriteXLS</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">openxlsx</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">car</span><span class="p">)</span>
-</pre></div>
-
-    </div>
 </div>
 </div>
 
@@ -13606,17 +13207,18 @@ Traceback:
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Load-the-data">Load the data<a class="anchor-link" href="#Load-the-data">&#182;</a></h2><p>I use the readxl library to read in the data</p>
+<p>The <a href="https://cran.r-project.org/web/packages/missForest/missForest.pdf">missForest</a> package from CRAN uses Random Forests to impute missing values. It is especially useful for mixed type data. I used this package to perform the imputation for this data set.</p>
+<p>I specify the parameter 'variablewise' to be TRUE so that an OOB error estimate for each variable will be returned separately.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[49]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span><span class="n">dataframe</span> <span class="o">&lt;-</span> <span class="nf">read_excel</span><span class="p">(</span><span class="s">&quot;C:/Users/ShanoyaTaylor/Dropbox/Georgia Tech Courses/2019 - 4Spring/CSE6242/Project/Data/RemovedNA.xlsx&quot;</span><span class="p">,</span> <span class="n">sheet</span> <span class="o">=</span> <span class="m">5</span><span class="p">)</span>
+<div class=" highlight hl-r"><pre><span></span><span class="n">dataImp</span> <span class="o">&lt;-</span> <span class="nf">missForest</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">variablewise</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13632,10 +13234,13 @@ Traceback:
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_text output_error">
-<pre>
-Error in read_excel(&#34;C:/Users/ShanoyaTaylor/Dropbox/Georgia Tech Courses/2019 - 4Spring/CSE6242/Project/Data/RemovedNA.xlsx&#34;, : could not find function &#34;read_excel&#34;
-Traceback:
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>  missForest iteration 1 in progress...done!
+  missForest iteration 2 in progress...done!
+  missForest iteration 3 in progress...done!
+  missForest iteration 4 in progress...done!
+  missForest iteration 5 in progress...done!
+  missForest iteration 6 in progress...done!
 </pre>
 </div>
 </div>
@@ -13644,12 +13249,93 @@ Traceback:
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The resulting value dataImp is a matrix that contains:</p>
+<ul>
+<li>$ximp - the imputed data matrix</li>
+<li>OOBerror - Estimated OOB imputation error for each column of data.
+<img src="https://github.com/ashlitaylor/HealthCare/blob/master/mseCalculation.jpg?raw=true" alt="Alt text"></li>
+</ul>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[50]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span>
+<div class=" highlight hl-r"><pre><span></span><span class="n">dataImp</span><span class="o">$</span><span class="n">OOBerror[23</span><span class="o">:</span><span class="m">32</span><span class="n">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<dl class=dl-horizontal>
+	<dt>MSE</dt>
+		<dd>0.381732765436799</dd>
+	<dt>MSE</dt>
+		<dd>106.642441077817</dd>
+	<dt>MSE</dt>
+		<dd>7.05317685574617</dd>
+	<dt>MSE</dt>
+		<dd>12.2606416254289</dd>
+	<dt>MSE</dt>
+		<dd>6.08575473128994</dd>
+	<dt>MSE</dt>
+		<dd>4.44642707230256</dd>
+	<dt>MSE</dt>
+		<dd>5.25579706976337</dd>
+	<dt>MSE</dt>
+		<dd>2234068.70333499</dd>
+	<dt>MSE</dt>
+		<dd>0.00188856964222758</dd>
+	<dt>MSE</dt>
+		<dd>1.60088477009723</dd>
+</dl>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I combine the original dataframe with the imputed values and export it to a CSV file for use in other models.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[52]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="n">dataDF[</span><span class="p">,</span><span class="m">6</span><span class="o">:</span><span class="m">37</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">dataImp</span><span class="o">$</span><span class="n">ximp</span><span class="p">)</span>
+
+<span class="c1">#con&lt;-file(&#39;filename&#39;,encoding=&quot;UTF-8&quot;)</span>
+<span class="c1">#write.csv(...,file=con,...)</span>
+
+<span class="n">con</span><span class="o">&lt;-</span><span class="nf">file</span><span class="p">(</span><span class="s">&quot;ImputedDataUpdate.csv&quot;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">)</span>
+<span class="nf">write.csv</span><span class="p">(</span><span class="n">dataDF</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="n">con</span><span class="p">)</span>
 </pre></div>
 
     </div>
