@@ -1,91 +1,42 @@
 # Socioeconomic Factors affecting Healthcare in America
-Project that examines how socioeconomic factors affect patient outcomes in America
+Team Project that examines and illustrates how socioeconomic factors affect patient outcomes in America. 
 
-# Project Title
+## Introduction
 
-One Paragraph of project description goes here
+Quality of care and patient outcomes are significant determinants of the effectiveness of a healthcare system. My team’s project expands upon the best practices in healthcare analytics for evaluating the current status of patient care, and analyzes relationships between various factors that drive cost and influence high quality outcomes. Our project summarizes the findings in a comprehensive, interactive representation of these factors to provide enhanced insight into the main drivers of quality of healthcare, and ultimately facilitates improved patient control and targeted improvement efforts.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Select your destination folder for the patient socioeconomic and outcome table. Both the R and Python scripts are set to run with relative paths, so placing both of these files into the same destination folder is enough (no need to set a working directory). 
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+* Python IDE
+* R IDE
 
 ```
-Give examples
+e.g. R Studio, Spyder, Jupyter
 ```
+<!---
 
-### Installing
+### Run
 
-A step by step series of examples that tell you how to get a development env running
+1. To run the pagerank.py algorithm, follow the steps below. 
+1. Since memory mapping works with binary files, the graph’s edge list needs to be converted into its binary format by running the following command at the terminal/command prompt (you only need to do this once):
 
-Say what the step will be
+    ```python q1_utils.py convert <path-to-edgelist.txt>```
 
-```
-Give the example
-```
+    This generates 3 files:
+    * A .bin binary file containing edges (source, target) in big-endian “int” C type
+    * A .idx: binary file containing (node, degree) in little-endian “int” C type
+    * A .json: metadata about the conversion process (required to run pagerank)
 
-And repeat
+2. To execute the PageRank algorithm, type the following code into the command line/terminal:
 
-```
-until finished
-```
+    ```pypy q1_utils.py pagerank <path to JSON file for LiveJournal>```
 
-End with an example of getting some data out of the system or using it for a little demo
+    This will output the 10 nodes witht he highest PageRank scores. The default number of iterations is 10. The number of iterations can be updated by adding the desired number to the end of the command:
+    ```pypy q1_utils.py pagerank toy-graph/toy-graph.json --iterations 25``
+    A file in the format pagerank_nodes_n.txt  for “n” number of iterations will be created.
 
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
-
+### Acknowledgments
